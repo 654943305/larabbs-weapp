@@ -39,19 +39,19 @@
     import replyMixin from '@/mixins/replyMixin'
 
     export default class replyUserIndex extends wepy.page {
-        config = {
-            enablePullDownRefresh: true,
-            navigationBarTitleText: '用户回复列表'
-        }
-        mixins = [replyMixin]
-        data = {
-            requestData: {},
-            include: 'user,topic'
-        }
-        async onLoad(options) {
-            this.requestData.url = 'users/' + options.user_id + '/replies'
-            this.requestData.include = 'user,topic'
-            this.getReplies()
-        }
+      config = {
+        enablePullDownRefresh: true,
+        navigationBarTitleText: '用户回复列表'
+      }
+      mixins = [replyMixin]
+      data = {
+        requestData: {},
+        include: 'user,topic'
+      }
+      async onLoad(options) {
+        this.requestData.url = 'users/' + options.user_id + '/replies'
+        this.requestData.include = 'user,topic'
+        this.getReplies()
+      }
     }
 </script>

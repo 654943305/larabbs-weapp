@@ -84,103 +84,103 @@
     import api from '@/utils/api'
 
     export default class UserEdit extends wepy.page {
-        config = {
-            navigationBarTitleText: '修改个人信息'
-        }
-        data = {
+      config = {
+        navigationBarTitleText: '修改个人信息'
+      }
+      data = {
             // 用户信息
-            user: null,
+        user: null,
             // 错误信息
-            errors: null,
+        errors: null,
             // 头像id
-            avatarId: 0
-        }
-        async onShow() {
+        avatarId: 0
+      }
+      async onShow() {
             // 获取当前用户信息
-            this.user = await this.$parent.getCurrentUser()
-            this.$apply()
-        }
+        this.user = await this.$parent.getCurrentUser()
+        this.$apply()
+      }
         // 表单提交
-        async submit (e) {
-            this.errors = null
-            try {
+      async submit (e) {
+        this.errors = null
+        try {
                 // e.detail.value 为表单提交的数据
-                let formData = e.detail.value
+          let formData = e.detail.value
 
                 // 当avatarId被设置过之后则增加到 avatar_image_id 中
-                if (this.avatarId !== 0) {
-                    formData.avatar_image_id = this.avatarId
-                }
+          if (this.avatarId !== 0) {
+            formData.avatar_image_id = this.avatarId
+          }
 
-                let editResponse = await api.authRequest({
-                    url: 'user',
-                    method: 'PUT',
-                    data: formData
-                })
+          let editResponse = await api.authRequest({
+            url: 'user',
+            method: 'PUT',
+            data: formData
+          })
 
                 // 设置报错信息
-                if (editResponse.statusCode === 422) {
-                    this.errors = editResponse.data.errors
-                    this.$apply()
-                }
+          if (editResponse.statusCode === 422) {
+            this.errors = editResponse.data.errors
+            this.$apply()
+          }
 
                 // 请求成功，缓存用户数据
-                if (editResponse.statusCode === 200) {
-                    this.user = editResponse.data
-                    wepy.setStorageSync('user', editResponse.data)
-                    this.$apply()
+          if (editResponse.statusCode === 200) {
+            this.user = editResponse.data
+            wepy.setStorageSync('user', editResponse.data)
+            this.$apply()
 
-                    wepy.showToast({
-                        title: '修改成功',
-                        icon: 'success',
-                        duration: 2000
-                    })
-                }
-            } catch (err) {
-                console.log(err)
-                wepy.showModal({
-                    title: '提示',
-                    content: '服务器错误，请联系管理员'
-                })
-            }
+            wepy.showToast({
+              title: '修改成功',
+              icon: 'success',
+              duration: 2000
+            })
+          }
+        } catch (err) {
+          console.log(err)
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
         }
+      }
 
-        methods = {
-            async updateAvatar () {
+      methods = {
+        async updateAvatar () {
                 // 选择头像图片
-                let image = await wepy.chooseImage({count: 1})
+          let image = await wepy.chooseImage({count: 1})
 
-                try {
+          try {
                     // 获取选择的图片
-                    let avatar = image.tempFilePaths[0]
+            let avatar = image.tempFilePaths[0]
 
                     // 调用上传图片接口
-                    let imageResponse = await api.updateFile({
-                        url: 'images',
-                        method: 'POST',
-                        name: 'image',
-                        formData: {
-                            type: 'avatar'
-                        },
-                        filePath: avatar
-                    })
+            let imageResponse = await api.updateFile({
+              url: 'images',
+              method: 'POST',
+              name: 'image',
+              formData: {
+                type: 'avatar'
+              },
+              filePath: avatar
+            })
 
                     // 上传成功成功记录数据
-                    if (imageResponse.statusCode === 201) {
+            if (imageResponse.statusCode === 201) {
                         // 小程序上传结果没有做 JSON.parse，需要手动处理
-                        let responseData = JSON.parse(imageResponse.data)
-                        this.user.avatar = responseData.path
-                        this.avatarId = responseData.id
-                        this.$apply()
-                    }
-                } catch (err) {
-                    console.log(err)
-                    wepy.showModal({
-                        title: '提示',
-                        content: '服务器错误，请联系管理员'
-                    })
-                }
+              let responseData = JSON.parse(imageResponse.data)
+              this.user.avatar = responseData.path
+              this.avatarId = responseData.id
+              this.$apply()
             }
+          } catch (err) {
+            console.log(err)
+            wepy.showModal({
+              title: '提示',
+              content: '服务器错误，请联系管理员'
+            })
+          }
         }
+      }
     }
 </script>

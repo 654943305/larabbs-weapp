@@ -37,103 +37,103 @@
     import api from '@/utils/api'
 
     export default class notificationIndex extends wepy.page {
-        config = {
-            enablePullDownRefresh: true,
-            navigationBarTitleText: '通知列表'
-        }
-        data = {
+      config = {
+        enablePullDownRefresh: true,
+        navigationBarTitleText: '通知列表'
+      }
+      data = {
             // 消息数据
-            notifications: [],
+        notifications: [],
             // 是否有更多数据
-            noMoreData: false,
+        noMoreData: false,
             // 是否正在加载
-            isLoading: false,
+        isLoading: false,
             // 当前分页
-            page: 1
-        }
+        page: 1
+      }
         // 获取消息
-        async getNotifications(reset = false) {
-            try {
-                let notificationResponse = await api.authRequest({
-                    url: 'user/notifications',
-                    data: {
-                        page: this.page
-                    }
-                })
+      async getNotifications(reset = false) {
+        try {
+          let notificationResponse = await api.authRequest({
+            url: 'user/notifications',
+            data: {
+              page: this.page
+            }
+          })
 
-                if (notificationResponse.statusCode === 200) {
-                    let notifications = notificationResponse.data.data
+          if (notificationResponse.statusCode === 200) {
+            let notifications = notificationResponse.data.data
 
                     // 格式化 created_at
-                    notifications.forEach(function (notification) {
-                        notification.created_at_diff = util.diffForHumans(notification.created_at)
-                    })
+            notifications.forEach(function (notification) {
+              notification.created_at_diff = util.diffForHumans(notification.created_at)
+            })
                     // 覆盖还是合并数据
-                    this.notifications = reset ? notifications : this.notifications.concat(notifications)
+            this.notifications = reset ? notifications : this.notifications.concat(notifications)
 
-                    let pagination = notificationResponse.data.meta.pagination
+            let pagination = notificationResponse.data.meta.pagination
 
                     // 根据分页判断是否有更多数据
-                    if (pagination.current_page === pagination.total_pages) {
-                        this.noMoreData = true
-                    }
-                    this.$apply()
-                }
-
-                return notificationResponse
-            } catch (err) {
-                console.log(err)
-                wepy.showModal({
-                    title: '提示',
-                    content: '服务器错误，请联系管理员'
-                })
+            if (pagination.current_page === pagination.total_pages) {
+              this.noMoreData = true
             }
-        }
-        async onLoad() {
-            this.getNotifications()
-            this.markAsRead()
-        }
-        async markAsRead() {
-            try {
-                // 标记消息为已读，不显示 loading 框
-                let markResponse = await api.authRequest({
-                    url: 'user/read/notifications',
-                    method: 'PUT'
-                }, false)
-
-                if (markResponse.statusCode === 204) {
-                    // 设置全局未读消息为 0
-                    this.$parent.globalData.unreadCount = 0
-                    this.$apply()
-                }
-            } catch (err) {
-                console.log(err)
-                wepy.showModal({
-                    title: '提示',
-                    content: '服务器错误，请联系管理员'
-                })
-            }
-        }
-        // 下拉刷新
-        async onPullDownRefresh() {
-            this.noMoreData = false
-            this.page = 1
-            await this.getNotifications(true)
-            // 设置消息已读
-            this.markAsRead()
-            wepy.stopPullDownRefresh()
-        }
-        // 加载更多
-        async onReachBottom () {
-            // 没有更多数据或这在加载则返回
-            if (this.noMoreData || this.isLoading) {
-                return
-            }
-            this.isLoading = true
-            this.page = this.page + 1
-            await this.getNotifications()
-            this.isLoading = false
             this.$apply()
+          }
+
+          return notificationResponse
+        } catch (err) {
+          console.log(err)
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
         }
+      }
+      async onLoad() {
+        this.getNotifications()
+        this.markAsRead()
+      }
+      async markAsRead() {
+        try {
+                // 标记消息为已读，不显示 loading 框
+          let markResponse = await api.authRequest({
+            url: 'user/read/notifications',
+            method: 'PUT'
+          }, false)
+
+          if (markResponse.statusCode === 204) {
+                    // 设置全局未读消息为 0
+            this.$parent.globalData.unreadCount = 0
+            this.$apply()
+          }
+        } catch (err) {
+          console.log(err)
+          wepy.showModal({
+            title: '提示',
+            content: '服务器错误，请联系管理员'
+          })
+        }
+      }
+        // 下拉刷新
+      async onPullDownRefresh() {
+        this.noMoreData = false
+        this.page = 1
+        await this.getNotifications(true)
+            // 设置消息已读
+        this.markAsRead()
+        wepy.stopPullDownRefresh()
+      }
+        // 加载更多
+      async onReachBottom () {
+            // 没有更多数据或这在加载则返回
+        if (this.noMoreData || this.isLoading) {
+          return
+        }
+        this.isLoading = true
+        this.page = this.page + 1
+        await this.getNotifications()
+        this.isLoading = false
+        this.$apply()
+      }
     }
 </script>

@@ -77,37 +77,37 @@
     import unreadCount from '@/mixins/unreadCount'
 
     export default class UserMe extends wepy.page {
-        config = {
-            navigationBarTitleText: '我的'
-        }
-        data = {
+      config = {
+        navigationBarTitleText: '我的'
+      }
+      data = {
             // 用户信息
-            user: null
-        }
-        mixins = [unreadCount]
-        async onShow() {
+        user: null
+      }
+      mixins = [unreadCount]
+      async onShow() {
             // 每次打开页面，获取当前用户信息
-            this.user = await this.$parent.getCurrentUser()
-            this.$apply()
-        }
-        methods = {
+        this.user = await this.$parent.getCurrentUser()
+        this.$apply()
+      }
+      methods = {
             // 退出登录方法
-            async logout (e) {
-                try {
-                    let logoutResponse = await api.logout()
+        async logout (e) {
+          try {
+            let logoutResponse = await api.logout()
 
-                    if (logoutResponse.statusCode === 204 || logoutResponse.statusCode === 500) {
-                        this.user = null
-                        this.$apply()
-                    }
-                } catch (err) {
-                    console.log(err)
-                    wepy.showModal({
-                        title: '提示',
-                        content: '服务器错误，请联系管理员'
-                    })
-                }
+            if (logoutResponse.statusCode === 204 || logoutResponse.statusCode === 500) {
+              this.user = null
+              this.$apply()
             }
-        };
+          } catch (err) {
+            console.log(err)
+            wepy.showModal({
+              title: '提示',
+              content: '服务器错误，请联系管理员'
+            })
+          }
+        }
+      };
     }
 </script>
