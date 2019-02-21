@@ -91,7 +91,7 @@
                 try {
                     let logoutResponse = await api.logout()
 
-                    if (logoutResponse.statusCode === 204) {
+                    if (logoutResponse.statusCode === 204 || logoutResponse.statusCode === 500) {
                         this.user = null
                         this.$apply()
                     }

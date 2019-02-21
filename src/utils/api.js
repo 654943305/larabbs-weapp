@@ -136,7 +136,7 @@ const logout = async (params = {}) => {
     })
 
     // 调用接口成功则清空缓存
-    if (logoutResponse.statusCode === 204) {
+    if (logoutResponse.statusCode === 204 || logoutResponse.statusCode === 500) {
         wepy.clearStorage()
     }
 
